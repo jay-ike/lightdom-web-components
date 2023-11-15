@@ -1,3 +1,4 @@
+/*jslint browser*/
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const monthNames = [
     "Jan",
@@ -22,7 +23,7 @@ const attributeMap = Object.freeze({
 function dayNames(sundayFirst) {
     return (
         sundayFirst
-        ? [days[6]].concat(days.slice(0,6))
+        ? [days[6]].concat(days.slice(0, 6))
         : days
     );
 }
@@ -42,16 +43,21 @@ function getInitialConfig() {
         dateFormat: "en-GB",
         ignoreOnFocus: false,
         initDate: null,
-        sundayFirst: false,
+        sundayFirst: false
     };
 }
 
 function buildActions() {
     let currentMonth = document.createElement("div");
-    let actions = ["previous year", "previous month","next month", "next year"];
+    let actions = [
+        "previous year",
+        "previous month",
+        "next month",
+        "next year"
+    ];
     const result = document.createElement("div");
     currentMonth.classList.add("month-display");
-    currentMonth.dataset.display="currentMonth";
+    currentMonth.dataset.display = "currentMonth";
     result.classList.add("space-around", "fill-grid-row");
     actions = actions.map(function (action) {
         let btn = document.createElement("button");
@@ -62,7 +68,8 @@ function buildActions() {
         return btn;
     });
     actions = actions.slice(0, 2).concat([currentMonth]).concat(
-        actions.slice(2));
+        actions.slice(2)
+    );
     actions.forEach((action) => result.appendChild(action));
     return result;
 }
@@ -89,8 +96,8 @@ function buildCalendarGrid({actionBuilder, getDayNames}) {
     return grid;
 }
 
-function isLeapYear (year) {
-    return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)
+function isLeapYear(year) {
+    return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
 }
 
 function endingDay(currentDay, sundayFirst) {
@@ -198,7 +205,7 @@ function generateDays(firstDayOfMonth, sundayFirst) {
     }
     return result;
 }
-
+/*jslint-disable*/
 class Datepicker extends HTMLElement {
     #config;
     #shown = false;
@@ -424,3 +431,4 @@ class Datepicker extends HTMLElement {
   }
 }
 customElements.define('date-picker', Datepicker)
+/*jslint-enable*/
