@@ -212,6 +212,7 @@ class Datepicker extends HTMLElement {
     #selectedDate;
     #displayedDate;
     #currentMonth;
+    #container;
   constructor () {
     let self;
     super();
@@ -359,6 +360,12 @@ class Datepicker extends HTMLElement {
       this.#displayedDate.setFullYear(year, month);
       this.#renderCalendar();
   }
+  #showCalendar() {
+      this.#shown = true;
+      this.#renderCalendar();
+      this.dataset.show = "";
+      this.#container.focus();
+  }
 
   init() {
     let mainContainer;
@@ -391,9 +398,6 @@ class Datepicker extends HTMLElement {
         }
     });
     this.#currentMonth = mainContainer.querySelector("[data-display]");
-    if (this.container) {
-      this.container.remove()
-    }
     this.addEventListener("click", function (event) {
         const {target} = event;
         event.preventDefault();
@@ -420,14 +424,16 @@ class Datepicker extends HTMLElement {
         }
     });
     this.addEventListener("focusin", function ({target}) {
-        if (target === this.#config.input) {
-            this.#shown = true;
-            this.#renderCalendar();
-            this.dataset.show = "";
-            mainContainer.focus();
+        if (target === this.#config.input && !this.#config.ignoreOnFocus) {
+            this.#showCalendar();
         }
     });
-    this.container = this.appendChild(mainContainer) // The returned value is the appended child
+    this.#container = this.appendChild(mainContainer);
+  }
+  showPicker() {
+      if (this.#config.ignoreOnFocus) {
+          this.#showCalendar();
+      }
   }
 }
 customElements.define('date-picker', Datepicker)
