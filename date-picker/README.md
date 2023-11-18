@@ -14,7 +14,7 @@ Note: this component is highly inspired by this [repo](https://github.com/vanill
 - [Contributing](\#contribution)
 - [License](\#license)
 
-## Features {\#features}
+## Features
 - custom date formating (locale based actually ex: "en-US")
 - initial date setting
 - first day of the week selection: sunday or monday
@@ -22,7 +22,7 @@ Note: this component is highly inspired by this [repo](https://github.com/vanill
 - accessible calendar
 - highly customizable calendar layout
 
-## Attributes {\#attributes}
+## Attributes
 
 | Name | Purpose | Default Behavior |
 | ------| ------- | ------- |
@@ -33,7 +33,7 @@ Note: this component is highly inspired by this [repo](https://github.com/vanill
 | init-day | date by which we should start showing the current month | the current date |
 | data-show | wheter we should show the calendar or not | No (cannot be modified manually) |
 
-## API {\#api}
+## API
 ### Calendar parts
 | Part | Role | How to access |
 | ------ | ------ | -------- |
@@ -65,7 +65,7 @@ Used to show the calendar when we have decided not to show it once the input is 
 This method help you to define your component in the light DOM
 You can optionally set the name by providing it as parameter to this method (the default name is **date-picker**)
 
-## How To Use {\#how-to}
+## How To Use
 To use this component we should setup the styling and integrate the component to the DOM with javascript
 
 An example of styling can be the following:
@@ -144,8 +144,8 @@ Because the Datepicker is set as a javascript we should add it to the page as a 
     </body>
 ```
 
-## Contributig {\#contribution}
+## Contributing
 Any questions, suggestions are welcome so feel free to let me know about it
 
-## License {\#license}
+## License
 To be honest I'm a big fan of free software so do whatever you want with this component (*please do good things with it and share it if you want*)
