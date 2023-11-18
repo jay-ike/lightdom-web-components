@@ -1,5 +1,11 @@
 /*jslint browser*/
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const defaultActions = [
+    "previous year",
+    "previous month",
+    "next month",
+    "next year"
+];
 const monthNames = [
     "Jan",
     "Feb",
@@ -16,6 +22,7 @@ const monthNames = [
 ];
 const attributeMap = Object.freeze({
     "date-format": "dateFormat",
+    "switch-year": "yearSwitchable",
     "ignore-on-focus": "ignoreOnFocus",
     "init-date": "initDate",
     "sunday-first": "sundayFirst"
@@ -43,22 +50,21 @@ function getInitialConfig() {
         dateFormat: "en-GB",
         ignoreOnFocus: false,
         initDate: null,
-        sundayFirst: false
+        sundayFirst: false,
+        yearSwitchable: false,
     };
 }
 
-function buildActions() {
+function buildActions(hasYearActions) {
     let currentMonth = document.createElement("div");
-    let actions = [
-        "previous year",
-        "previous month",
-        "next month",
-        "next year"
-    ];
+    let actions = defaultActions;
     const result = document.createElement("div");
+    if (hasYearActions === false) {
+        actions = defaultActions.slice(1, 3);
+    }
     currentMonth.classList.add("month-display");
     currentMonth.dataset.display = "currentMonth";
-    result.classList.add("space-around", "fill-grid-row");
+    result.classList.add("actions");
     actions = actions.map(function (action) {
         let btn = document.createElement("button");
         btn.dataset.action = action;
@@ -213,6 +219,13 @@ class Datepicker extends HTMLElement {
     #displayedDate;
     #currentMonth;
     #container;
+
+  static define(name = "date-picker") {
+      if (window.customElements !== undefined) {
+          window.customElements.define(name, Datepicker);
+      }
+  }
+
   constructor () {
     let self;
     super();
@@ -228,66 +241,6 @@ class Datepicker extends HTMLElement {
             self.#config[attributeMap[attribute]] = self.getAttribute(attribute);
         }
     });
-    this._css = `
-    date-picker {
-        position: relative;
-        isolation: isolate;
-    }
-    .space-around {
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
-    }
-    .fill-grid-row {
-        grid-column: -1 / 1;
-    }
-    .grow-2 {
-        flex-grow: 2;
-    }
-    .actions {
-        margin-block-end: .5rem;
-    }
-    .inline-padding {
-        padding-inline: var(--i-pad, .5rem);
-    }
-
-    [data-show] > .calendar-grid {
-        --calendar-display: grid;
-    }
-    .calendar-grid {
-        display: var(--calendar-display, none);
-        grid-template-columns: repeat(7, auto);
-        gap: var(--c-gap, 0px);
-        padding: 10px;
-        position: absolute;
-        inset-block-end: calc(100% + .5rem);
-        background-color: var(--calendar-bg, white);
-    }
-    .calendar-grid  button {
-        font-size: var(--button-font, 1.25em);
-        border: var(--button-bdr, none);
-        color: var(--day-color, currentColor);
-        background-color: var(--day-bg, transparent);
-        padding: 5px;
-    }
-    .calendar-grid .selected {
-        --day-color: var(--day-color-selected, red);
-    }
-    .day-name {
-        font-size: var(--day-font, 1.25em);
-        text-align: center;
-    }
-    .flow-row + .flow-row {
-        margin-inline-start: .25rem;
-    }
-    .date:is(:hover,:focus):not(:disabled) {
-        --day-color: var(--day-color-focus, white);
-        --day-bg: var(--day-bg-focus, black);
-    }
-    .calendar-grid > button:disabled {
-        color: var(--day-color-disabled, #c4c4c4);
-    }
-    `
   }
 
   static get observedAttributes () {
@@ -304,9 +257,6 @@ class Datepicker extends HTMLElement {
   }
 
   connectedCallback () {
-      let style = document.createElement("style");
-      style.innerHTML = this._css;
-      this.appendChild(style);
       if (this.isConnected) {
           this.init();
       }
@@ -371,13 +321,13 @@ class Datepicker extends HTMLElement {
     let mainContainer;
     const self = this;
     this.#config.input = this.querySelector('input')
-    if (this.#config.input === null) {
-      return
+    if (this.#config.input === null || this.#container !== undefined) {
+      return;
     }
     this.#displayedDate = parseDate(this.#config.initDate).value;
 
     mainContainer = buildCalendarGrid({
-        actionBuilder: buildActions,
+        actionBuilder: () => buildActions(this.#config.yearSwitchable),
         getDayNames: () => dayNames(this.#config.sundayFirst)
     });
     this.addEventListener("focusout", function (event) {
@@ -410,16 +360,16 @@ class Datepicker extends HTMLElement {
             this.#shown = false;
             delete this.dataset.show;
         }
-        if (target.dataset.action === "previous month") {
+        if (target.dataset.action === defaultActions[1]) {
             this.#updateMonth((month) => month - 1);
         }
-        if (target.dataset.action === "next month") {
+        if (target.dataset.action === defaultActions[2]) {
             this.#updateMonth((month) => month + 1);
         }
-        if (target.dataset.action === "previous year") {
+        if (target.dataset.action === defaultActions[0]) {
             this.#updateYear((year) => year - 1);
         }
-        if (target.dataset.action === "next year") {
+        if (target.dataset.action === defaultActions[3]) {
             this.#updateYear((year) => year + 1);
         }
     });
@@ -436,5 +386,5 @@ class Datepicker extends HTMLElement {
       }
   }
 }
-customElements.define('date-picker', Datepicker)
+export default Datepicker;
 /*jslint-enable*/
