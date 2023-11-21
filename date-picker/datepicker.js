@@ -220,171 +220,172 @@ class Datepicker extends HTMLElement {
     #currentMonth;
     #container;
 
-  static define(name = "date-picker") {
-      if (window.customElements !== undefined) {
-          window.customElements.define(name, Datepicker);
-      }
-  }
-
-  constructor () {
-    let self;
-    super();
-    self = this;
-    this.#config = getInitialConfig();
-    this.getAttributeNames().forEach(function (attribute) {
-        if (self.#config[attributeMap[attribute]] === undefined) {
-            return;
-        }
-        if (self.getAttribute(attribute).length === 0) {
-            self.#config[attributeMap[attribute]] = true;
+    static define(name = "step-by-step") {
+        if (typeof window.customElements === "object") {
+            window.customElements.define(name, Datepicker);
         } else {
-            self.#config[attributeMap[attribute]] = self.getAttribute(attribute);
+            console.warn("custom elements are not supported in this browser");
         }
-    });
-  }
-
-  static get observedAttributes () {
-      return ["data-show"];
-  }
-
-  attributeChangedCallback (name, ignore, newValue) {
-      if (this.#shown === true && newValue === null) {
-          this.dataset.show = "";
-      }
-      if (this.#shown === false && typeof newValue === "string") {
-          delete this.dataset.show;
-      }
-  }
-
-  connectedCallback () {
-      if (this.isConnected) {
-          this.init();
-      }
-  }
-
-  #renderCalendar() {
-      const selectedDate = this.#selectedDate;
-      let firstDay = parseDate(this.#displayedDate).with({date: 1});
-      let dates = this.querySelectorAll("button.date");
-      let days = generateDays(firstDay, this.#config.sundayFirst);
-      this.#currentMonth.textContent = monthNames[firstDay.getMonth()];
-      this.#currentMonth.textContent += " " + firstDay.getFullYear();
-      dates.forEach(function (date, index) {
-          let day = days[index];
-          if (day === undefined) {
-              return;
-          }
-          if (areSameDay(new Date(), day.date)) {
-              date.classList.add("today");
-          } else {
-              date.classList.remove("today");
-          }
-          if (areSameDay(day.date, selectedDate)) {
-              date.classList.add("selected");
-          } else {
-              date.classList.remove("selected");
-          }
-          date.textContent = day.content;
-          date.disabled = !day.active;
-          date.date = day.date;
-      });
-  }
-
-  #updateMonth(monthUpdater) {
-      let month = monthUpdater(this.#displayedDate.getMonth());
-      let year = this.#displayedDate.getFullYear();
-      if (month < 0) {
-          month = 12 + month;
-          year -= 1;
-      }
-      if (month > 11) {
-          month = 12 % month;
-          year += 1;
-      }
-      this.#displayedDate.setFullYear(year, month, 1);
-      this.#renderCalendar();
-  }
-  #updateYear(yearUpdater) {
-      let year = yearUpdater(this.#displayedDate.getFullYear());
-      let month = this.#displayedDate.getMonth();
-      this.#displayedDate.setFullYear(year, month);
-      this.#renderCalendar();
-  }
-  #showCalendar() {
-      this.#shown = true;
-      this.#renderCalendar();
-      this.dataset.show = "";
-      this.#container.focus();
-  }
-
-  init() {
-    let mainContainer;
-    const self = this;
-    this.#config.input = this.querySelector('input')
-    if (this.#config.input === null || this.#container !== undefined) {
-      return;
     }
-    this.#displayedDate = parseDate(this.#config.initDate).value;
-
-    mainContainer = buildCalendarGrid({
-        actionBuilder: () => buildActions(this.#config.yearSwitchable),
-        getDayNames: () => dayNames(this.#config.sundayFirst)
-    });
-    this.addEventListener("focusout", function (event) {
-        const {relatedTarget, target} = event;
-        const shouldStop = (
-            relatedTarget !== null
-            && (
-                relatedTarget.parentElement === target
-                || relatedTarget.parentElement.parentElement === target
-            )
-        );
-        if (target.classList.contains("calendar-grid")) {
-            if (shouldStop) {
+    constructor () {
+        let self;
+        super();
+        self = this;
+        this.#config = getInitialConfig();
+        this.getAttributeNames().forEach(function (attr) {
+            if (self.#config[attributeMap[attr]] === undefined) {
                 return;
             }
-            this.#shown = false;
+            if (self.getAttribute(attr).length === 0) {
+                self.#config[attributeMap[attr]] = true;
+            } else {
+                self.#config[attributeMap[attr]] = self.getAttribute(attr);
+            }
+        });
+    }
+
+    static get observedAttributes () {
+        return ["data-show"];
+    }
+
+    attributeChangedCallback (name, ignore, newValue) {
+        if (this.#shown === true && newValue === null) {
+            this.dataset.show = "";
+        }
+        if (this.#shown === false && typeof newValue === "string") {
             delete this.dataset.show;
         }
-    });
-    this.#currentMonth = mainContainer.querySelector("[data-display]");
-    this.addEventListener("click", function (event) {
-        const {target} = event;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        if (target.classList.contains("date")) {
-            this.#selectedDate = target.date;
-            this.#config.input.value = new Intl.DateTimeFormat(
-                self.#config.dateFormat
-            ).format(target.date);
-            this.#shown = false;
-            delete this.dataset.show;
+    }
+
+    connectedCallback () {
+        if (this.isConnected) {
+            this.init();
         }
-        if (target.dataset.action === defaultActions[1]) {
-            this.#updateMonth((month) => month - 1);
+    }
+
+    #renderCalendar() {
+        const selectedDate = this.#selectedDate;
+        let firstDay = parseDate(this.#displayedDate).with({date: 1});
+        let dates = this.querySelectorAll("button.date");
+        let days = generateDays(firstDay, this.#config.sundayFirst);
+        this.#currentMonth.textContent = monthNames[firstDay.getMonth()];
+        this.#currentMonth.textContent += " " + firstDay.getFullYear();
+        dates.forEach(function (date, index) {
+            let day = days[index];
+            if (day === undefined) {
+                return;
+            }
+            if (areSameDay(new Date(), day.date)) {
+                date.classList.add("today");
+            } else {
+                date.classList.remove("today");
+            }
+            if (areSameDay(day.date, selectedDate)) {
+                date.classList.add("selected");
+            } else {
+                date.classList.remove("selected");
+            }
+            date.textContent = day.content;
+            date.disabled = !day.active;
+            date.date = day.date;
+        });
+    }
+
+    #updateMonth(monthUpdater) {
+        let month = monthUpdater(this.#displayedDate.getMonth());
+        let year = this.#displayedDate.getFullYear();
+        if (month < 0) {
+            month = 12 + month;
+            year -= 1;
         }
-        if (target.dataset.action === defaultActions[2]) {
-            this.#updateMonth((month) => month + 1);
+        if (month > 11) {
+            month = 12 % month;
+            year += 1;
         }
-        if (target.dataset.action === defaultActions[0]) {
-            this.#updateYear((year) => year - 1);
+        this.#displayedDate.setFullYear(year, month, 1);
+        this.#renderCalendar();
+    }
+    #updateYear(yearUpdater) {
+        let year = yearUpdater(this.#displayedDate.getFullYear());
+        let month = this.#displayedDate.getMonth();
+        this.#displayedDate.setFullYear(year, month);
+        this.#renderCalendar();
+    }
+    #showCalendar() {
+        this.#shown = true;
+        this.#renderCalendar();
+        this.dataset.show = "";
+        this.#container.focus();
+    }
+
+    init() {
+        let mainContainer;
+        const self = this;
+        this.#config.input = this.querySelector('input')
+        if (this.#config.input === null || this.#container !== undefined) {
+            return;
         }
-        if (target.dataset.action === defaultActions[3]) {
-            this.#updateYear((year) => year + 1);
-        }
-    });
-    this.addEventListener("focusin", function ({target}) {
-        if (target === this.#config.input && !this.#config.ignoreOnFocus) {
+        this.#displayedDate = parseDate(this.#config.initDate).value;
+
+        mainContainer = buildCalendarGrid({
+            actionBuilder: () => buildActions(this.#config.yearSwitchable),
+            getDayNames: () => dayNames(this.#config.sundayFirst)
+        });
+        this.addEventListener("focusout", function (event) {
+            const {relatedTarget, target} = event;
+            const shouldStop = (
+                relatedTarget !== null
+                && (
+                    relatedTarget.parentElement === target
+                    || relatedTarget.parentElement.parentElement === target
+                )
+            );
+            if (target.classList.contains("calendar-grid")) {
+                if (shouldStop) {
+                    return;
+                }
+                this.#shown = false;
+                delete this.dataset.show;
+            }
+        });
+        this.#currentMonth = mainContainer.querySelector("[data-display]");
+        this.addEventListener("click", function (event) {
+            const {target} = event;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if (target.classList.contains("date")) {
+                this.#selectedDate = target.date;
+                this.#config.input.value = new Intl.DateTimeFormat(
+                    self.#config.dateFormat
+                ).format(target.date);
+                this.#shown = false;
+                delete this.dataset.show;
+            }
+            if (target.dataset.action === defaultActions[1]) {
+                this.#updateMonth((month) => month - 1);
+            }
+            if (target.dataset.action === defaultActions[2]) {
+                this.#updateMonth((month) => month + 1);
+            }
+            if (target.dataset.action === defaultActions[0]) {
+                this.#updateYear((year) => year - 1);
+            }
+            if (target.dataset.action === defaultActions[3]) {
+                this.#updateYear((year) => year + 1);
+            }
+        });
+        this.addEventListener("focusin", function ({target}) {
+            if (target === this.#config.input && !this.#config.ignoreOnFocus) {
+                this.#showCalendar();
+            }
+        });
+        this.#container = this.appendChild(mainContainer);
+    }
+    showPicker() {
+        if (this.#config.ignoreOnFocus) {
             this.#showCalendar();
         }
-    });
-    this.#container = this.appendChild(mainContainer);
-  }
-  showPicker() {
-      if (this.#config.ignoreOnFocus) {
-          this.#showCalendar();
-      }
-  }
+    }
 }
 export default Datepicker;
 /*jslint-enable*/
