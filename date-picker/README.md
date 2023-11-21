@@ -38,10 +38,10 @@ Note: this component is highly inspired by this [repo](https://github.com/vanill
 | Part | Role | How to access |
 | ------ | ------ | -------- |
 | calendar grid | This is the container holding the entire calendar | look for the div having the **calendar-grid** class |
-| current month | This is the container displaying the current month (and year) | look for div having the **month-display** class or the **data-display** attribute equals to currentMonth |
+| current month | This is the container displaying the current month (and year) | look for div having the **month-display** class or the **data-display** attribute equals to **currentMonth** |
 | actions | This is the container holding the actions available in the calendar | look for div having the **actions** class |
-| The previous year action (if enabled) | enable us to present the current month in the year prior to the current year | look for button with the **data-action** attribute  of **previous year* |
-| The next year action (if enabled) | enable us to present the current month in the year next to the current year | look for button with the **data-action** attribute of **next year* |
+| The previous year action (if enabled) | enable us to present the current month in the year prior to the current year | look for button with the **data-action** attribute  of **previous year** |
+| The next year action (if enabled) | enable us to present the current month in the year next to the current year | look for button with the **data-action** attribute of **next year** |
 | The previous month | enable us to present the month prior to the current month | look for a button with the **data-action** attribute of **previous month** |
 | The next month | enable us to present the month next to the current month | look for a button with the **data-action** attribute of **next month** |
 | The days names| These are the containers holding the names of each days of the week | look for divs having the **day-name** class |
