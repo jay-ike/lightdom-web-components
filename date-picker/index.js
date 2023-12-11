@@ -1,5 +1,13 @@
 /*jslint browser*/
-const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const days = [
+    {abbreviation: "Monday", name: "Mon"},
+    {abbreviation: "Tuesday", name: "Tue"},
+    {abbreviation: "Wednesday", name: "Wed"},
+    {abbreviation: "Thursday", name: "Thu"},
+    {abbreviation: "Friday", name: "Fri"},
+    {abbreviation: "Saturday", name: "Sat"},
+    {abbreviation: "Sunday", name: "Sun"}
+];
 const defaultActions = [
     "previous year",
     "previous month",
@@ -20,12 +28,18 @@ const monthNames = [
     "Nov",
     "Dec"
 ];
+const dateAttributeMap = Object.freeze({
+    "day-format": "day",
+    "month-format": "month",
+    "week-day-format": "weekday",
+    "year-format": "year"
+});
 const attributeMap = Object.freeze({
-    "date-format": "dateFormat",
-    "switch-year": "yearSwitchable",
     "ignore-on-focus": "ignoreOnFocus",
     "init-date": "initDate",
-    "sunday-first": "sundayFirst"
+    "locale": "locale",
+    "sunday-first": "sundayFirst",
+    "switch-year": "yearSwitchable"
 });
 function dayNames(sundayFirst) {
     return (
@@ -47,11 +61,17 @@ function areSameDay(date1, date2) {
 
 function getInitialConfig() {
     return {
-        dateFormat: "en-GB",
+        dateOptions: {
+            day: "numeric",
+            month: "numeric",
+            weekday: null,
+            year: "numeric"
+        },
         ignoreOnFocus: false,
         initDate: null,
+        locale: "en-GB",
         sundayFirst: false,
-        yearSwitchable: false,
+        yearSwitchable: false
     };
 }
 
@@ -83,10 +103,14 @@ function buildActions(hasYearActions) {
 function buildCalendarGrid({actionBuilder, getDayNames}) {
     const grid = document.createElement("div");
     let actions = actionBuilder();
-    let names = getDayNames().map(function (name) {
+    let names = getDayNames().map(function ({abbreviation, name}) {
+        let abbr;
         let result = document.createElement("div");
+        abbr = document.createElement("abbr");
+        abbr.setAttribute("title", abbreviation);
+        abbr.textContent = name;
         result.classList.add("day-name", "flow-row");
-        result.textContent = name;
+        result.appendChild(abbr);
         return result;
     });
     let numbers = new Array(42).fill(0).map(function () {
@@ -98,7 +122,7 @@ function buildCalendarGrid({actionBuilder, getDayNames}) {
     grid.classList.add("calendar-grid");
     grid.appendChild(actions);
     names.concat(numbers).forEach((elt) => grid.appendChild(elt));
-    grid.tabIndex = 0;
+    grid.setAttribute("lang", "en")
     return grid;
 }
 
@@ -219,8 +243,9 @@ class Datepicker extends HTMLElement {
     #displayedDate;
     #currentMonth;
     #container;
+    #formatter
 
-    static define(name = "step-by-step") {
+    static define(name = "date-picker") {
         if (typeof window.customElements === "object") {
             window.customElements.define(name, Datepicker);
         } else {
@@ -233,22 +258,42 @@ class Datepicker extends HTMLElement {
         self = this;
         this.#config = getInitialConfig();
         this.getAttributeNames().forEach(function (attr) {
-            if (self.#config[attributeMap[attr]] === undefined) {
+            const isGeneric = self.#config[attributeMap[attr]] !== undefined;
+            const dateEquiv= self.#config.dateOptions[dateAttributeMap[attr]];
+            const value = self.getAttribute(attr);
+            if (!isGeneric && dateEquiv === undefined) {
                 return;
             }
-            if (self.getAttribute(attr).length === 0) {
+            if (isGeneric && value.length === 0) {
                 self.#config[attributeMap[attr]] = true;
             } else {
-                self.#config[attributeMap[attr]] = self.getAttribute(attr);
+                self.#config[attributeMap[attr]] = value;
+            }
+            if (dateEquiv !== undefined && value.length !== 0) {
+                self.#config.dateOptions[dateAttributeMap[attr]] = value;
             }
         });
+        try {
+            this.#formatter = this.#getFormatter(this.#config);
+        } catch (ignore) {
+            this.#formatter = this.#getFormatter(getInitialConfig());
+        }
     }
 
     static get observedAttributes () {
         return ["data-show"];
     }
 
-    attributeChangedCallback (name, ignore, newValue) {
+    #getFormatter(config) {
+        const options = config.dateOptions;
+        options.weekday = options.weekday ?? undefined;
+        return new Intl.DateTimeFormat(config.locale ?? undefined, options);
+    }
+
+    attributeChangedCallback (ignore, oldValue, newValue) {
+        if (oldValue === newValue) {
+            return;
+        }
         if (this.#shown === true && newValue === null) {
             this.dataset.show = "";
         }
@@ -355,9 +400,7 @@ class Datepicker extends HTMLElement {
             event.stopImmediatePropagation();
             if (target.classList.contains("date")) {
                 this.#selectedDate = target.date;
-                this.#config.input.value = new Intl.DateTimeFormat(
-                    self.#config.dateFormat
-                ).format(target.date);
+                this.#config.input.value = this.#formatter.format(target.date);
                 this.#shown = false;
                 delete this.dataset.show;
             }
