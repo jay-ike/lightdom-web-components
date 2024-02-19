@@ -34,6 +34,12 @@ Note: this component is highly inspired by this [repo](https://github.com/vanill
 | data-show | wheter we should show the calendar or not | No (cannot be modified manually) |
 
 ## API
+### Calendar events
+#### dateselected
+the event fired when a date is selected by a user
+The detail's property of this event is
+- date: which is a Date Object representing the selected date
+
 ### Calendar parts
 | Part | Role | How to access |
 | ------ | ------ | -------- |

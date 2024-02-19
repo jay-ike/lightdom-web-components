@@ -37,7 +37,7 @@ This is a web component that wraps a set of block elements to show them step by 
 ### Step-by-Step events
 #### indexupdated
 This event is fired when the current step has been updated
-The properties of this event are:
+The detail's properties of this event are:
 
 - current: the value of the index after update
 - previous: the value of the index before update
