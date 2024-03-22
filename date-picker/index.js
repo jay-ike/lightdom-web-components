@@ -233,24 +233,23 @@ class Datepicker extends HTMLElement {
     #currentMonth;
     #container;
     #formatter
-
     static define(name = "date-picker") {
-        let tagName;
+        let construct;
         if (typeof window.customElements === "undefined") {
             console.warn("custom elements are not supported in this browser");
             return;
         }
-        tagName = window.customElements.getName(Datepicker);
-        if (tagName !== null && tagName !== name) {
+        construct = window.customElements.get(name);
+        if (construct !== undefined) {
             console.warn(
                 "a custom element with the name " + name +
-                " but different constructor already exists"
+                " already exists"
             );
-        }
-        if (tagName === null) {
+        } else {
             window.customElements.define(name, Datepicker);
         }
     }
+
     constructor () {
         let self;
         super();

@@ -5,22 +5,20 @@ class Stepper extends HTMLElement {
     constructor() {
         super();
     }
-
     static define(name = "step-by-step") {
-        let tagName;
+        let construct;
         if (typeof window.customElements === "undefined") {
             console.warn("custom elements are not supported in this browser");
             return;
         }
-        tagName = window.customElements.getName(Stepper);
-        if (tagName !== undefined && tagName !== name) {
+        construct = window.customElements.get(name);
+        if (construct !== undefined) {
             console.warn(
                 "a custom element with the name " + name +
-                " but different constructor already exists"
+                " already exists"
             );
-        }
-        if (tagName === null) {
-            window.customElements.define(name, Datepicker);
+        } else {
+            window.customElements.define(name, Stepper);
         }
     }
 
