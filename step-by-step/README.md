@@ -85,10 +85,11 @@ To integrate it to the DOM we have to first of all grap the code in a file
 In the javascript file we just do this
 ```javascript
 import StepByStep from "./path/to/step-by-step";
-StepByStep.define(); //if you provide a name it should be seperated by a - ex: my-picker
+StepByStep.define(); //if you provide a name it should be seperated by a - ex: my-stepper
 ```
 
-Because the Datepicker is set as a javascript we should add it to the page as a module script assuming your main javascript file is called **index.js**
+Because the StepByStep is set as a javascript we should add it to the page as a module script assuming your main javascript file is called **index.js**
+
 ```html
     <body>
         <step-by-step>

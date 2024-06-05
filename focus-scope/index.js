@@ -71,4 +71,4 @@ class FocusScope extends HTMLElement {
         this.#keepFocus();
     }
 }
-export defaul
+export default FocusScope;
