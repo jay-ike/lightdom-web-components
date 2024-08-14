@@ -1,8 +1,17 @@
 
+function getFocusableChildren(element) {
+    return element.querySelectorAll(
+        ":is(a:any-link, button, input[type='checkbox'], " +
+        "input[type='radio'], input[type='text'], input[type='password'], " +
+        "input[type='email'], textarea, select):not([disabled])"
+    );
+
+}
 class FocusScope extends HTMLElement {
     #focusRetained;
     #controller = new AbortController();
     #firstFocusable;
+    #lastFocusable;
     static define(name = "focus-scope") {
         let construct;
         if (typeof window.customElements === "undefined") {
@@ -26,14 +35,17 @@ class FocusScope extends HTMLElement {
 
     connectedCallback() {
         const self = this;
+        let focusables;
 
         if (!self.isConnected) {
             return;
         }
-        self.#firstFocusable = self.querySelector("button, a[href], input, [tabindex]");
+        focusables = getFocusableChildren(element);
+        self.#firstFocusable = focusables[0];
+        self.#lastFocusable = focusables[focusables.length - 1];
         self.#focusRetained = self.getAttribute("unscoped") === null;
         self.addEventListener("focusout", function(event) {
-            const { relatedTarget} = event;
+            const {relatedTarget} = event;
             let relatedParent;
 
             event.preventDefault();
@@ -49,6 +61,22 @@ class FocusScope extends HTMLElement {
                 self.#keepFocus(relatedTarget);
             }
         }, { signal: self.#controller.signal });
+        self.addEventListener("keydown", function (event) {
+            if (event.key !== "Tab") {
+                return;
+            }
+            if (event.shiftKey) {
+                if (document.activeElement === self.#firstFocusable) {
+                    self.#lastFocusable.focus();
+                    event.preventDefault();
+                }
+            } else {
+                if (document.activeElement === self.#lastFocusable) {
+                    self.#firstFocusable.focus();
+                    event.preventDefault();
+                }
+            }
+        }, {signal: self.#controller.signal});
     }
 
     #keepFocus(target = this) {

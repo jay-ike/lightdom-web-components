@@ -6,8 +6,8 @@ This is a web component that when added in a page restrict the focus to stay wit
 - [Features](\#features)
 - [Attributes](\#attributes)
 - [API](\#api)
-    - Step-by-Step parts
-    - Step-by-Step methods
+    - focus-scope instance methods
+    - focus-scope static methods
 - [How to Use](\#how-to)
     - styling
     - integration
@@ -40,7 +40,7 @@ This method is used to remove the focus listener
 This method is used to apply the focus scope (it's mostly used at initialization)
 
 
-### Step-by-Step static methods
+### focus-scope static methods
 
 #### define
 This method help you to define your component in the light DOM
@@ -83,7 +83,7 @@ Because the FocusScope is set as a javascript we should add it to the page as a 
 ```
 
 ## Contributing
-Any questions, suggestions are welcome so feel free to let me know about it I will really appreciate it
+Any questions, suggestions are welcome so feel free to let me know about it. I will really appreciate it
 
 ## License
 To be honest I'm a big fan of free software so do whatever you want with this component (*please do good things with it and share it if you want*)
